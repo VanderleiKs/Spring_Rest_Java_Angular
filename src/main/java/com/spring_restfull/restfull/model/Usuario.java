@@ -1,31 +1,58 @@
 package com.spring_restfull.restfull.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
+import javax.persistence.UniqueConstraint;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-public class Usuario  implements Serializable{
+public class Usuario implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(unique = true)
     private String login;
     private String senha;
     private String nome;
+    private String token;
 
     @OneToMany(mappedBy = "usuario", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Telefone> telefones = new ArrayList<>();
 
-    public Usuario(){
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "usuarios_role", uniqueConstraints = @UniqueConstraint(
+        columnNames = {"usuario_id", "role_id"}, name = "unique_role_user"),
+        joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario",
+        foreignKey = @ForeignKey(name = "usuario_fk", value = ConstraintMode.CONSTRAINT)),
+        
+        inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role", updatable = false,
+        foreignKey = @ForeignKey(name = "role_fk", value = ConstraintMode.CONSTRAINT)))
+    private List<Role> roles;
+
+    public Usuario() {
+    }
+
+    public Usuario(String msg){
     }
 
     public Usuario(Long id, String login, String senha, String nome) {
@@ -66,6 +93,7 @@ public class Usuario  implements Serializable{
     public void setNome(String nome) {
         this.nome = nome;
     }
+    
 
     public List<Telefone> getTelefones() {
         return telefones;
@@ -94,5 +122,54 @@ public class Usuario  implements Serializable{
         } else if (!id.equals(other.id))
             return false;
         return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getPassword() {
+        return this.senha;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getUsername() {
+        return this.login;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

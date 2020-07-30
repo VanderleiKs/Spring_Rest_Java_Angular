@@ -15,12 +15,15 @@
     <script>
 
         $(document).ready (
-
         function(){
             $.ajax({
                 url:"https://app-restspring.herokuapp.com/usuario",
                 method:"GET"
             }).then (function(data, status, info){
+                for(var i = 0; i < 3; i++){
+                document.write(data[i].id +", " + data[i].login + "\n");
+                }
+
             });
         }
         );
