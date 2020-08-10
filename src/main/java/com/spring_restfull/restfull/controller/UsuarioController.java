@@ -52,7 +52,7 @@ public class UsuarioController {
         return ResponseEntity.ok().body(new UsuarioDTO(usuario.get()));
     }
 
-    @PostMapping(value = "/cadastrar", produces = "application/json")
+    @PostMapping(value = "/cadastrar")
     @CacheEvict(value = "cacheUsuarios", allEntries = true)
     public ResponseEntity<Usuario> saveById(@RequestBody Usuario usuario) {
         for (int i = 0; i < usuario.getTelefones().size(); i++) {

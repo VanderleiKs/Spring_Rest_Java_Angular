@@ -58,6 +58,9 @@ public class JwtTokenAutenticacaoService {
         /** Adiciona cabeçalho */
         response.addHeader(HEADER_STRING, token); /** fica algo assim: Authorization: Bearer codigotoken */
 
+        /**Liberar acesso para portas diferentes*/
+        liberacaoCors(response);
+
         /** Escreve o token como resposta no corpo http */
         response.getWriter().write("{\"Authorization\": \"" + token + "\"}");
     }
@@ -98,6 +101,25 @@ public class JwtTokenAutenticacaoService {
             }
         }
 
+        /**Liberar acesso para portas diferentes*/
+        liberacaoCors(response);
         return null; /** Não autorizdo */
+    }
+
+    private void liberacaoCors(HttpServletResponse response) {
+
+        if (response.getHeader("Access-Control-Allow-Headers") == null){
+            response.addHeader("Access-Control-Allow-Headers", "*");
+        }
+        if (response.getHeader("Access-Control-Allow-Request") == null){
+            response.addHeader("Access-Control-Allow-Request", "*");
+        }
+        if (response.getHeader("Access-Control-Allow-Origin") == null){
+            response.addHeader("Access-Control-Allow-Origin", "*");
+        }
+        if (response.getHeader("Access-Control-Request-Headers") == null){
+            response.addHeader("Access-Control-Request-Headers", "*");
+        }
+
     }
 }
